@@ -1,5 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
+  <script>
+    var start = false;
+    //   function changeBtnPause(){
+    //   document.querySelector('#startPause');
+    //   document.querySelector('#startPause').textContent
+    //   document.querySelector('#startPause').innerText
+    //   document.querySelector('#startPause').textContent = 'Pause';
+    // }
+    // function changeBtnStop(){
+    //   document.querySelector('#startPause');
+    //   document.querySelector('#startPause').textContent
+    //   document.querySelector('#startPause').innerText
+    //   document.querySelector('#startPause').textContent = 'Stop';
+    // }
+
+    function logicL() {
+      var stop = document.querySelector("#startPause").innerText;
+      var pause = document.querySelector("#startPause").innerText;
+
+      if (stop == "Start") {
+        massage = "Pause";
+      } else {
+        massage = "Start";
+      }
+      document.getElementById("startPause").innerHTML = massage;
+    }
+
+    function onClickFunc() {
+      start = !start;
+    }
+  </script>
+
   <head>
     <!-- Required meta tags -->
     <meta charset="utf-8" />
@@ -24,7 +56,14 @@
       crossorigin="anonymous"
     ></script>
 
-    <button type="button" class="btn btn-primary">Start</button>
+    <button
+      id="startPause"
+      type="button"
+      class="btn btn-primary btnClickEvent"
+      onclick="onClickFunc() || logicL()"
+    >
+      Start
+    </button>
 
     <h2>Water Level Mueasurement</h2>
     <div id="chart-waterLevel" class="container col-xs-1 center-block"></div>
@@ -51,21 +90,24 @@
       credits: { enabled: false },
     });
     setInterval(function () {
-      var xhttp = new XMLHttpRequest();
-      xhttp.onreadystatechange = function () {
-        if (this.readyState == 4 && this.status == 200) {
-          var x = new Date().getTime(),
-            y = parseFloat(this.responseText);
-          //console.log(this.responseText);
-          if (chartW.series[0].data.length > 40) {
-            chartW.series[0].addPoint([x, y], true, true, true);
-          } else {
-            chartW.series[0].addPoint([x, y], true, false, true);
+      console.log(start);
+      if (start) {
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function () {
+          if (this.readyState == 4 && this.status == 200) {
+            var x = new Date().getTime(),
+              y = parseFloat(this.responseText);
+            //console.log(this.responseText);
+            if (chartW.series[0].data.length > 40) {
+              chartW.series[0].addPoint([x, y], true, true, true);
+            } else {
+              chartW.series[0].addPoint([x, y], true, false, true);
+            }
           }
-        }
-      };
-      xhttp.open("GET", "/start", true);
-      xhttp.send();
-    }, 1000);
+        };
+        xhttp.open("GET", "/start", true);
+        xhttp.send();
+      }
+    }, 2000);
   </script>
 </html>
