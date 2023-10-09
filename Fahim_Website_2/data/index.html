@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<script>
+  var start = false;
+  let baseUrl = 'https://script.google.com/macros/s/AKfycbz10GBIvo7GLs91FydSvZF4UQcSHI6utGy1v7UXLzCt7wRSy0nJQPi1enWN2TgAl4AS/exec?distance=';
+  //   function changeBtnPause(){
+  //   document.querySelector('#startPause');
+  //   document.querySelector('#startPause').textContent
+  //   document.querySelector('#startPause').innerText
+  //   document.querySelector('#startPause').textContent = 'Pause';
+  // }
+  // function changeBtnStop(){
+  //   document.querySelector('#startPause');
+  //   document.querySelector('#startPause').textContent
+  //   document.querySelector('#startPause').innerText
+  //   document.querySelector('#startPause').textContent = 'Stop';
+  // }
+
+  function logicL() {
+    var stop = document.querySelector("#startPause").innerText;
+    var pause = document.querySelector("#startPause").innerText;
+
+    if (stop == "Start") {
+      massage = "Pause";
+    } else {
+      massage = "Start";
+    }
+    document.getElementById("startPause").innerHTML = massage;
+  }
+
+  function onClickFunc() {
+    start = !start;
+  }
+</script>
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+  <script src="https://code.highcharts.com/highcharts.js"></script>
+  <link rel="stylesheet" href="css/style.css" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
+
+  <title>Water Level Mueasurement</title>
+</head>
+
+<body>
+
+  <div id="mySidebar" class="sidebar">
+    <a href="#" class="closebtn">&times;</a>
+    <a href="#">Why This Project</a>
+    <a href="#">Project Description</a>
+    <a href="#">Related Work</a>
+    <a href="#">About Us</a>
+    <a href="#">Contact Us</a>
+    <a href="#">FAQs</a>
+  </div>
+
+  <div id="main">
+    <button class="openbtn" onclick="openNav()">☰ Options</button>
+  </div>
+
+  <script>
+    function openNav() {
+      document.getElementById("mySidebar").style.width = "250px";
+      document.getElementById("main").style.marginLeft = "250px";
+    }
+
+    function closeNav() {
+      document.getElementById("mySidebar").style.width = "0";
+      document.getElementById("main").style.marginLeft = "0";
+    }
+
+    document.querySelector('.closebtn').addEventListener("click", closeNav);
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+    crossorigin="anonymous"></script>
+
+  <button id="startPause" type="button" class="btn btn-primary btnClickEvent" onclick="onClickFunc() || logicL()">
+    Start
+  </button>
+
+  <h2>Water Level Mueasurement</h2>
+  <div id="chart-waterLevel" class="container col-xs-1 center-block"></div>
+</body>
+
+<script>
+  var chartW = new Highcharts.Chart({
+    chart: { renderTo: "chart-waterLevel" },
+    title: { text: "Water Level" },
+    series: [
+      {
+        showInLegend: false,
+        data: [],
+      },
+    ],
+    plotOptions: {
+      line: { animation: false, dataLabels: { enabled: true } },
+      series: { color: "#059e8a" },
+    },
+    xAxis: { type: "datetime", dateTimeLabelFormats: { second: "%H:%M:%S" } },
+    yAxis: {
+      title: { text: "Water Level (cm)" },
+    },
+    credits: { enabled: false },
+  });
+
+  setInterval(function () {
+    console.log(start);
+    if (start) {
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+          var x = new Date().getTime(),
+            y = parseFloat(this.responseText);
+          let url = baseUrl + y;
+
+          fetch(url, {
+            mode: 'no-cors' // 'cors' by default
+          })
+            .then(response => response.text())
+            .then(data => console.log(data))
+            .catch(error => console.log('Error:', error));
+
+          //console.log(this.responseText);
+          if (chartW.series[0].data.length > 40) {
+            chartW.series[0].addPoint([x, y], true, true, true);
+          } else {
+            chartW.series[0].addPoint([x, y], true, false, true);
+          }
+        }
+      };
+      xhttp.open("GET", "/start", true);
+      xhttp.send();
+    }
+  }, 3000);
+</script>
+
+</html>
